@@ -10,6 +10,18 @@ type BemSignature = {
   v1: string;
 };
 
+type TransformedContent = {
+  date?: string;
+  name?: string;
+  amount?: number;
+  unit_price?: number;
+  total_price?: number;
+};
+
+type WebhookPayload = {
+  transformedContent?: TransformedContent | null;
+};
+
 function parseBemSignatureHeader(header: string): BemSignature | null {
   // Example: "t=1492774577, v1=0734be64d748aa8e8ee9dfe87407665541f2c33f9b0ebf19dfd0dd80f08f504c"
   const parts = header
@@ -117,7 +129,7 @@ export async function POST(req: Request) {
   }
 
   // Signature is valid; safely parse and handle the payload
-  let json: any;
+  let json: WebhookPayload;
   try {
     json = JSON.parse(bodyText);
   } catch (e) {
@@ -127,16 +139,30 @@ export async function POST(req: Request) {
 
   console.log(json);
 
-  if (Object.keys(json.transformatedContent).length > 0) {
-    await db.insert(schema.receipts).values({
-      name: json.transformatedContent.name,
-      amount: json.transformatedContent.amount,
-      unit_price: json.transformatedContent.unit_price,
-      total_price: json.transformatedContent.total_price,
-      date: json.transformatedContent.date ?? undefined,
-    });
+  const content = json?.transformedContent;
+  if (content && typeof content === "object") {
+    const { name, amount, unit_price, total_price, date } = content;
+    const hasRequired =
+      typeof name === "string" &&
+      typeof amount === "number" &&
+      typeof unit_price === "number" &&
+      typeof total_price === "number";
 
-    console.log("Receipt saved successfully");
+    if (hasRequired) {
+      await db.insert(schema.receipts).values({
+        name,
+        amount: amount.toFixed(2),
+        unit_price: unit_price.toFixed(2),
+        total_price: total_price.toFixed(2),
+        date: date ?? undefined,
+      });
+      console.log("Receipt saved successfully");
+    } else {
+      console.warn(
+        "Webhook payload missing required fields in transformedContent",
+        content,
+      );
+    }
   }
 
   return NextResponse.json({ ok: true });
