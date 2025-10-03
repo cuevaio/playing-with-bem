@@ -30,7 +30,7 @@ export default async function Home() {
       </span>
 
       <Receipts preloadedReceipts={preloadedReceipts} />
-      <div className="flex space-x-4">
+      <div className="grid grid-cols-1 gap-2">
         <a
           href="http://bem.ai/"
           target="_blank"
@@ -54,6 +54,14 @@ export default async function Home() {
           className="underline"
         >
           Google Drive with sample files
+        </a>
+        <a
+          href="https://youtu.be/62tKO9Y62cI"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Founder's walkthrough
         </a>
       </div>
     </div>
