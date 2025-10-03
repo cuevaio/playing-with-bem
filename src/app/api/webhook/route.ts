@@ -131,8 +131,8 @@ export async function POST(req: Request) {
     await db.insert(schema.receipts).values({
       name: json.transformatedContent.name,
       amount: json.transformatedContent.amount,
-      unitPrice: json.transformatedContent.unitPrice,
-      totalPrice: json.transformatedContent.totalPrice,
+      unit_price: json.transformatedContent.unitPrice,
+      total_price: json.transformatedContent.totalPrice,
       date: json.transformatedContent.date ?? undefined,
     });
 
