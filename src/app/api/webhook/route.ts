@@ -1,5 +1,7 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
+import { db } from "@/db";
+import * as schema from "@/db/schema";
 
 export const runtime = "nodejs";
 
@@ -124,11 +126,18 @@ export async function POST(req: Request) {
   }
 
   console.log(json);
-  // Example: Access transformed data
-  // const transformed = json?.transformedContent;
 
-  // TODO: Add your business logic here (store in DB, enqueue job, etc.)
+  if (Object.keys(json.transformatedContent).length > 0) {
+    await db.insert(schema.receipts).values({
+      name: json.transformatedContent.name,
+      amount: json.transformatedContent.amount,
+      unitPrice: json.transformatedContent.unitPrice,
+      totalPrice: json.transformatedContent.totalPrice,
+      date: json.transformatedContent.date ?? undefined,
+    });
 
-  // Acknowledge receipt quickly to avoid timeouts on the sender side
+    console.log("Receipt saved successfully");
+  }
+
   return NextResponse.json({ ok: true });
 }
