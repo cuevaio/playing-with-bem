@@ -14,11 +14,7 @@ export function Upload() {
   });
 
   return (
-    <form
-      action={action}
-      encType="multipart/form-data"
-      className="flex items-center gap-3"
-    >
+    <form action={action} className="flex items-center gap-3">
       <label htmlFor="file" className="sr-only">
         File
       </label>
